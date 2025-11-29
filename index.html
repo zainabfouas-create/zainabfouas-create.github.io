@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هدية الى زينب - حب، موسيقى وثيم أسود</title>
+    
+    <!-- تحميل Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- تحميل مكتبة Tone.js للمؤثرات الصوتية -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <style>
+        /* إعداد الخط ليتناسب مع اللغة العربية */
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&family=Amiri:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #000000; /* خلفية سوداء عميقة */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden; 
+            position: relative;
+        }
+
+        /* حاوية مطر الأحرف */
+        .letter-rain-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .falling-letter {
+            position: absolute;
+            font-family: 'Amiri', serif;
+            color: #ff527c; /* لون وردي للأحرف */
+            opacity: 0.15; /* زيادة الوضوح */
+            animation: fall 15s linear infinite; /* سرعة السقوط */
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg); /* دوران مع السقوط */
+                opacity: 0;
+            }
+        }
+
+        /* نمط القلوب المتحركة في الخلفية */
+        .heart-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .heart {
+            position: absolute;
+            color: #ff527c; 
+            animation: floatHeart 10s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes floatHeart {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+                transform: translateY(90vh) scale(1);
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.2);
+                opacity: 0.1;
+            }
+        }
+
+        /* تنسيق البطاقة الرئيسية - تأثير زجاجي (Glassmorphism) */
+        .card {
+            background-color: rgba(26, 26, 26, 0.7); /* خلفية داكنة شفافة */
+            backdrop-filter: blur(10px); /* مفتاح التأثير الزجاجي */
+            -webkit-backdrop-filter: blur(10px); /* دعم متصفحات الويب كيت */
+            color: #e5e5e5;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); /* ظل داكن وعميق */
+            max-width: 520px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.5s ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.1); /* حدود خفيفة */
+            z-index: 10;
+        }
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 0.8s forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        .themed-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            margin: 20px auto;
+            border-radius: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+        .pulse-once {
+            animation: pulse-effect 0.8s ease-out;
+        }
+        @keyframes pulse-effect {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        /* تصميم خاص للرسائل المتتالية */
+        .message-box {
+            background-color: rgba(255, 255, 255, 0.05); /* خلفية خفيفة للرسائل */
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            text-align: right;
+            border-left: 3px solid #ff527c;
+        }
+        .message-box.response {
+            border-left: none;
+            border-right: 3px solid #c3b1e1; /* لون مختلف لرد زينب */
+            text-align: left;
+        }
+        /* الأزرار تبقى كما هي بتصميم واضح ومشرق لتباين مع الثيم الداكن */
+        .btn-primary {
+            background-color: #ff527c;
+            color: white;
+            font-weight: 700;
+            padding: 14px 32px;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 82, 124, 0.4);
+            border: 2px solid #ff527c;
+        }
+        .btn-primary:hover {
+            background-color: #e8486f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 82, 124, 0.6);
+        }
+        .btn-secondary {
+            background-color: #333;
+            color: #e5e5e5;
+            font-weight: 700;
+            padding: 14px 32px;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 2px solid #555;
+        }
+        .btn-secondary:hover {
+            background-color: #444;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        .amiri-font {
+            font-family: 'Amiri', serif;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- مشغل يوتيوب مخفي للموسيقى الخلفية -->
+    <div id="youtube-embed" style="position: absolute; width: 0; height: 0; overflow: hidden; opacity: 0;">
+        <iframe id="bg-music-iframe" width="560" height="315" src="https://www.youtube.com/embed/b2vxSfbuA8o?autoplay=0&loop=1&playlist=b2vxSfbuA8o&controls=0&disablekb=1&modestbranding=1" 
+                frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+        </iframe>
+    </div>
+
+    <!-- تلميح للموسيقى في حال لم تعمل تلقائياً -->
+    <!-- تم إزالة 'hidden' لجعلها تظهر وتختفي بتأثير التلاشي -->
+    <div id="music-hint" class="fixed bottom-4 right-4 text-xs text-gray-500 bg-gray-900 p-2 rounded-lg z-50 transition duration-500 opacity-100">
+        🎶 **هام:** اضغطي على أي زر لتشغيل الموسيقى والمؤثرات الصوتية!
+    </div>
+
+    <div class="letter-rain-container" id="letter-rain-container"></div>
+
+    <div id="app" class="card">
+        <!-- شاشة التحميل -->
+        <h1 id="loading-text" class="text-2xl text-pink-500 font-bold fade-in">
+            مرحباً بكِ، يا زينب! 🌹
+            <br>
+            لحظة من فضلك... ⏳
+        </h1>
+
+        <!-- محتوى الصفحة الرئيسية -->
+        <div id="content" class="hidden">
+            <!-- سيتم حقن المحتوى الديناميكي هنا -->
+        </div>
+    </div>
+
+    <script>
+        // إعداد Tone.js للصوت
+        const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        let isAudioInitialized = false; // علامة لضمان تشغيل الصوت مرة واحدة فقط
+
+        // ** دالة التمهيد الصوتي الشاملة (الإصلاح الجذري لمشكلة الصوت) **
+        function initializeAudioContext() {
+            if (isAudioInitialized) return;
+
+            // 1. بدء تشغيل Tone.js (مؤثرات النقرات)
+            if (Tone.context.state !== 'running') {
+                Tone.start();
+            }
+
+            // 2. بدء تشغيل الموسيقى الخلفية
+            const youtubeIframe = document.getElementById('bg-music-iframe');
+            if (youtubeIframe && youtubeIframe.src.includes('autoplay=0')) {
+                // استبدال autoplay=0 بـ autoplay=1 لفرض تشغيل الفيديو
+                const newSrc = youtubeIframe.src.replace('autoplay=0', 'autoplay=1');
+                youtubeIframe.src = newSrc;
+            }
+
+            // إخفاء تلميح الموسيقى
+            const musicHint = document.getElementById('music-hint');
+            musicHint.classList.remove('opacity-100');
+            musicHint.classList.add('opacity-0');
+            setTimeout(() => musicHint.classList.add('hidden'), 500);
+            
+            isAudioInitialized = true;
+        }
+
+
+        const clickSound = () => {
+            // يتم استدعاء تهيئة الصوت في كل نقرة (تنفذ مرة واحدة فقط)
+            initializeAudioContext(); 
+            
+            // تشغيل صوت "نقرة" لطيف
+            synth.triggerAttackRelease("C4", "C5", "16n");
+        };
+
+        // دالة مساعدة لتأخير التنفيذ
+        const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+        // العناصر الرئيسية في الصفحة
+        const loadingText = document.getElementById('loading-text');
+        const contentDiv = document.getElementById('content');
+        const letterRainContainer = document.getElementById('letter-rain-container');
+
+        // مسارات الصور المحدثة
+        const imagePath1 = 'https://s.gbl.ws/assets/images/image.png-dd8e3cb3-ff34-40b4-99f8-accb7e9093c8';
+        const imagePath2 = 'https://s.gbl.ws/assets/images/image.png-d521f5a8-7248-4bb5-8bae-ff7b2323ed25';
+        const imagePathFinal = 'https://g.top4top.io/p_3620fibuq0.jpeg'; 
+
+        // حالة التطبيق
+        let state = 0; 
+
+        // الدوال المسؤولة عن عرض المحتوى
+        function renderContent(htmlContent, pulse = true) {
+            contentDiv.innerHTML = htmlContent;
+            contentDiv.classList.remove('hidden');
+            if (pulse) {
+                contentDiv.classList.add('pulse-once');
+                contentDiv.addEventListener('animationend', () => contentDiv.classList.remove('pulse-once'), { once: true });
+            }
+        }
+
+        // --- مشاهد الموقع المختلفة ---
+
+        // المشهد 1: التحقق من الاسم 
+        function scene1_isZainab() {
+            const html = `
+                <div class="fade-in">
+                    <img src="${imagePath1}" alt="صورة توضيحية للمرحلة الأولى" class="themed-image mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-100 mb-6 mt-4">هل أنتِ زينب؟ 🤔</h2>
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
+                        <button onclick="handleZainabResponse(true); clickSound();" class="btn-primary">
+                            نعم، أنا هي! ✨
+                        </button>
+                        <button onclick="handleZainabResponse(false); clickSound();" class="btn-secondary">
+                            لا (No) ❌
+                        </button>
+                    </div>
+                </div>
+            `;
+            renderContent(html);
+        }
+
+        // المشهد 2: سؤال الحب 
+        function scene2_doYouLoveMe() {
+            state = 2;
+            const html = `
+                <div class="fade-in">
+                    <img src="${imagePath1}" alt="صورة حب" class="themed-image mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-100 mb-6 mt-4">يا زينب، هل تحبيني؟ 🥺</h2>
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
+                        <button onclick="handleLoveResponse(true); clickSound();" class="btn-primary">
+                            نعم، طبعاً! 🥰
+                        </button>
+                        <button onclick="handleLoveResponse(false); clickSound();" class="btn-secondary">
+                            لا (No) 😭
+                        </button>
+                    </div>
+                </div>
+            `;
+            renderContent(html);
+        }
+
+        // المشهد 3: التفاعلات المتسلسلة (المحادثة)
+        function scene3_conversation() {
+            state = 3;
+            contentDiv.dataset.conversationStep = 0; 
+            
+            const html = `
+                <div class="fade-in">
+                    <img src="${imagePath2}" alt="صورة تعبيرية للمحادثة" class="themed-image mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-100 mb-6 mt-4">لحظة حقيقة... 💬</h2>
+                    
+                    <div id="chat-sequence" class="mb-8 p-4 bg-black/30 rounded-xl overflow-y-auto max-h-60">
+                        <!-- الرسائل ستظهر هنا بالتسلسل -->
+                    </div>
+
+                    <button id="next-conv-btn" onclick="handleNextConvClick(); clickSound();" class="btn-primary w-full">
+                        (ابدأي المحادثة) ➡️
+                    </button>
+                </div>
+            `;
+            renderContent(html);
+        }
+        
+        // التفاعل المتسلسل للمحادثة
+        const chatSequence = [
+            { sender: 'فؤاد', text: 'شو حاس ما تحبيني 🤔' },
+            { sender: 'زينب', text: 'لا والله أحبك ❤️‍🩹', style: 'response' },
+            { sender: 'فؤاد', text: 'ممممم... 🤨' },
+            { sender: 'زينب', text: 'بوسة 💋', style: 'response' }, 
+        ];
+
+        function continueConversation() {
+            const chatBox = document.getElementById('chat-sequence');
+            const nextButton = document.getElementById('next-conv-btn');
+            let step = parseInt(contentDiv.dataset.conversationStep || 0);
+            
+            if (!nextButton || step >= chatSequence.length) {
+                return;
+            }
+
+            const message = chatSequence[step];
+            
+            const msgElement = document.createElement('div');
+            msgElement.className = `message-box fade-in ${message.style || ''}`;
+            const senderColor = message.sender === 'فؤاد' ? 'text-pink-400' : 'text-purple-400';
+            msgElement.innerHTML = `<span class="font-bold ${senderColor}">${message.sender}:</span> ${message.text}`;
+            
+            chatBox.appendChild(msgElement);
+            chatBox.scrollTop = chatBox.scrollHeight; 
+            
+            contentDiv.dataset.conversationStep = step + 1;
+            
+            if (step === chatSequence.length - 1) {
+                // آخر رسالة
+                nextButton.innerText = 'انتقل لإعلان الحب النهائي! 🚀';
+            } else {
+                nextButton.innerText = 'الرسالة التالية...';
+            }
+        }
+        
+        // ** دالة معالجة نقرة زر المحادثة **
+        function handleNextConvClick() {
+            const nextButton = document.getElementById('next-conv-btn');
+            if (!nextButton) return;
+
+            if (nextButton.innerText.includes('انتقل لإعلان الحب النهائي')) {
+                scene7_finalDeclaration();
+            } else {
+                continueConversation();
+            }
+        }
+
+        // المشهد 7: الإعلان النهائي عن الحب
+        function scene7_finalDeclaration() {
+            state = 7;
+            const html = `
+                <div class="fade-in text-center">
+                    <img src="${imagePathFinal}" alt="صورة إعلان الحب النهائي" class="themed-image mx-auto">
+
+                    <p class="text-xl text-gray-400 my-4">**ترا أدري تحبيني وتموتين عليه** 😒</p>
+
+                    <h1 class="text-4xl font-extrabold text-pink-600 my-6">
+                        لأن... 💖
+                    </h1>
+
+                    <h2 class="text-3xl md:text-5xl amiri-font font-extrabold text-purple-400 leading-snug">
+                        أنا أحبكِ <span class="text-red-500">حبًا</span> يملأ الكون... أحبكِ جدًا جدًا!!! 🥹🫶
+                    </h2>
+
+                    <p class="text-2xl font-bold text-gray-100 mt-8 mb-12">
+                        أحبكِ يا زينب ❤️
+                    </p>
+
+                    <hr class="my-6 border-gray-700">
+
+                    <p class="text-sm text-gray-500 mt-6">
+                        هاي الهدية من تؤام روحج وحبيبج فؤادج 🥹
+                    </p>
+                </div>
+            `;
+            renderContent(html);
+        }
+
+        // --- معالجات التفاعل ---
+
+        // التعامل مع سؤال "هل أنتِ زينب؟"
+        function handleZainabResponse(isZainab) {
+            if (isZainab) {
+                scene2_doYouLoveMe();
+            } else {
+                const surpriseHtml = `
+                    <div class="fade-in">
+                        <img src="${imagePath1}" alt="صورة مفاجأة" class="themed-image mx-auto opacity-70">
+                        <h2 class="text-3xl font-bold text-gray-100 mb-6 mt-4">عفواً! هل أنتِ متأكدة من أنكِ لستِ زينب؟ 🤔</h2>
+                        <button onclick="scene2_doYouLoveMe(); clickSound();" class="btn-primary mt-4">
+                            تراجعت! أنا زينب. 😇
+                        </button>
+                    </div>
+                `;
+                renderContent(surpriseHtml);
+            }
+        }
+
+        // التعامل مع سؤال "هل تحبيني؟"
+        async function handleLoveResponse(lovesMe) {
+            if (lovesMe) {
+                // الانتقال إلى المحادثة المتسلسلة
+                scene3_conversation(); 
+            } else {
+                await persuadeLoop();
+            }
+        }
+
+        async function persuadeLoop() {
+            clickSound();
+            contentDiv.innerHTML = `
+                <div class="fade-in">
+                    <img src="https://picsum.photos/400/200?random=5" alt="صورة وجه غاضب" class="themed-image mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-100 mb-6 mt-4">هذه إجابة غير مقبولة! 😡</h2>
+                </div>
+            `;
+            await delay(1500);
+
+            clickSound();
+            contentDiv.innerHTML = `
+                <div class="fade-in">
+                    <img src="https://picsum.photos/400/200?random=6" alt="صورة وجه باك" class="themed-image mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-100 mb-6 mt-4">زينب، هل أنتِ متأكدة من إجابتكِ؟ 🥺</h2>
+                </div>
+            `;
+            await delay(1500);
+
+            clickSound();
+            contentDiv.innerHTML = `
+                <div class="fade-in">
+                    <img src="https://picsum.photos/400/200?random=7" alt="صورة وجه متوسل" class="themed-image mx-auto">
+                    <h2 class="text-3xl font-bold text-gray-100 mb-6 mt-4">أتوسل إليكِ، أعيدي النظر! 🙏</h2>
+                    <button onclick="scene7_finalDeclaration(); clickSound();" class="btn-primary mt-4">
+                        حسناً، نعم أحبك! (اضغطي هنا) ❤️
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Functions for background effects (same as before)
+        function createHearts() {
+            const container = document.createElement('div');
+            container.className = 'heart-container';
+            document.body.prepend(container);
+
+            for (let i = 0; i < 30; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.innerHTML = '💖'; 
+                
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDelay = Math.random() * 10 + 's';
+                heart.style.animationDuration = (8 + Math.random() * 7) + 's';
+                heart.style.fontSize = (16 + Math.random() * 14) + 'px';
+                container.appendChild(heart);
+            }
+        }
+
+        function createFallingLetters() {
+            const letters = ['Z', 'F'];
+            const numberOfLetters = 50; 
+
+            for (let i = 0; i < numberOfLetters; i++) {
+                const letter = document.createElement('div');
+                letter.className = 'falling-letter';
+                letter.innerHTML = letters[Math.floor(Math.random() * letters.length)];
+                
+                letter.style.left = Math.random() * 100 + 'vw';
+                letter.style.fontSize = (20 + Math.random() * 30) + 'px'; 
+                letter.style.animationDelay = Math.random() * 15 + 's';
+                letter.style.animationDuration = (10 + Math.random() * 10) + 's';
+                letterRainContainer.appendChild(letter);
+            }
+        }
+
+        // --- وظيفة بدء تشغيل الموقع ---
+        async function startApp() {
+            createHearts(); 
+            createFallingLetters(); 
+            
+            // تهيئة الصوت والبدء الآن يعتمد بالكامل على نقرة المستخدم
+            
+            loadingText.classList.add('fade-in');
+
+            await delay(2000);
+
+            loadingText.classList.remove('fade-in');
+            loadingText.classList.add('hidden');
+            scene1_isZainab();
+        }
+
+        // ابدأ التطبيق بمجرد تحميل الصفحة
+        window.onload = startApp;
+    </script>
+</body>
+</html>
+
